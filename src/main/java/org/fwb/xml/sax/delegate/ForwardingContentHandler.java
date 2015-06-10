@@ -5,14 +5,19 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-public class ForwardingContentHandler implements ContentHandler {
-	private final ContentHandler delegate;
-	public ForwardingContentHandler(ContentHandler delegate) {
-		this.delegate = delegate;
+/** this would extend ForwardingObject but prefers to avoid the dependency */
+public abstract class ForwardingContentHandler implements ContentHandler {
+	public static class FixedForwardingContentHandler extends ForwardingContentHandler {
+		private final ContentHandler delegate;
+		public FixedForwardingContentHandler(ContentHandler delegate) {
+			this.delegate = delegate;
+		}
+		public ContentHandler delegate() {
+			return delegate;
+		}
 	}
-	public ContentHandler delegate() {
-		return delegate;
-	}
+	
+	public abstract ContentHandler delegate();
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {

@@ -3,6 +3,7 @@ package org.fwb.xml.sax.snax;
 import java.io.File;
 import java.util.LinkedList;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.xml.sax.Attributes;
@@ -38,16 +39,19 @@ import org.xml.sax.SAXException;
  */
 public class SmartContentHandler extends SimpleContentHandler {
 	/** serialization token for a QName, surprisingly absent from the QName api */
-	static String toName(QName e) {
-		return e == null ? null : (
-				(e.getPrefix() == null ? "" : e.getPrefix() + ":")
-				+ e.getLocalPart());
+	static String toName(QName qName) {
+		if (null == qName)
+			return null;
+		if (null == qName.getPrefix())
+			throw new IllegalArgumentException("unexpected null prefix (try XMLConstants#DEFAULT_NS_PREFIX?): " + qName);
+		return (XMLConstants.DEFAULT_NS_PREFIX.equals(qName.getPrefix()) ? "" : qName.getPrefix() + ":")
+				+ qName.getLocalPart();
 	}
 	static String toPrefix(String qName) {
 		if (qName == null)
 			throw new IllegalArgumentException("can't get prefix of null");
 		int colon = qName.indexOf(":");
-		return colon < 0 ? null : qName.substring(0, colon);
+		return colon < 0 ? XMLConstants.DEFAULT_NS_PREFIX : qName.substring(0, colon);
 	}
 	
 	private final LinkedList<QName> STACK = new LinkedList<QName>();
@@ -86,11 +90,15 @@ public class SmartContentHandler extends SimpleContentHandler {
 		endElement(e.getNamespaceURI(), e.getLocalPart(), toName(e));
 	}
 	
-	/** @deprecated use of this method is not recommended; it is usually best-practice to self-balance */
-	public void endAllElements() throws SAXException {
+	/**
+	 * Closes all open elements and the document.
+	 * @deprecated use of this method is not recommended; it is usually best-practice to self-balance
+	 */
+	public void endAll() throws SAXException {
 		while (! STACK.isEmpty()) {
 			endElement();
 		}
+		endDocument();
 	}
 	
 	/* convenience methods, N.B. these do NOT apply XSD-typing in any way. */
@@ -170,6 +178,7 @@ public class SmartContentHandler extends SimpleContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 		flush();
 		currentElement = new QName(uri, localName, toPrefix(qName));
-		currentAttributes = new SimpleAttributes(atts);
+		currentAttributes = new SimpleAttributes();
+		currentAttributes.addAttributes(atts);
 	}
 }

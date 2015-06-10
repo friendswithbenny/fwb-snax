@@ -2,14 +2,20 @@ package org.fwb.xml.sax.delegate;
 
 import org.xml.sax.Attributes;
 
-public class ForwardingAttributes implements Attributes {
-	private final Attributes delegate;
-	public ForwardingAttributes(Attributes delegate) {
-		this.delegate = delegate;
+/** this would extend ForwardingObject but prefers to avoid the dependency */
+public abstract class ForwardingAttributes implements Attributes {
+	public static class FixedForwardingAttributes extends ForwardingAttributes {
+		private final Attributes delegate;
+		public FixedForwardingAttributes(Attributes delegate) {
+			this.delegate = delegate;
+		}
+		public Attributes delegate() {
+			return delegate;
+		}
 	}
-	public Attributes delegate() {
-		return delegate;
-	}
+	
+	public abstract Attributes delegate();
+	
 	@Override
 	public int getIndex(String s, String s1) {
 		return delegate().getIndex(s, s1);

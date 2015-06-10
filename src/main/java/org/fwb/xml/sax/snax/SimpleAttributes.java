@@ -12,13 +12,6 @@ public class SimpleAttributes extends AttributesImpl {
 	public static final String
 		CDATA = "CDATA";
 	
-	public SimpleAttributes() {
-		super();
-	}
-	/** @a attributes to copy and initialize with */
-	public SimpleAttributes(Attributes a) {
-		super(a);
-	}
 	/** bulk add */
 	public void addAttributes(Attributes a) {
 		for (int i = 0; i < a.getLength(); ++i)
@@ -33,6 +26,7 @@ public class SimpleAttributes extends AttributesImpl {
 	/** namespace-free, text attributes */
 	public void addAttribute(String name, Object value) {
 		String type = CDATA;
+		// TODO(benny)
 //		if (value instanceof Number)
 //			type = "xs:decimal";
 //		if (value instanceof Boolean)

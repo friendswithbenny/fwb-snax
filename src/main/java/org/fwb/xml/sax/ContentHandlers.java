@@ -37,20 +37,11 @@ public class ContentHandlers {
 	public static ContentHandler createContentHandler(File f) {
 		return createContentHandler(new StreamResult(f));
 	}
-	/**
-	 * @deprecated
-	 * 	prefer versions which specify a systemID
-	 * @see #createContentHandler(String, OutputStream)
-	 */
+	/** @see #createContentHandler(String, OutputStream) */
 	public static ContentHandler createContentHandler(OutputStream os) {
 		return createContentHandler(new StreamResult(os));
 	}
-	/**
-	 * @deprecated
-	 * 	"Normally, a stream should be used rather than a reader[SIC],
-	 * 	so that the transformer may use instructions contained
-	 * 	in the transformation instructions[SIC] to control the encoding."
-	 */
+	/** @see #createContentHandler(String, Writer) */
 	public static ContentHandler createContentHandler(Writer w) {
 		return createContentHandler(new StreamResult(w));
 	}
@@ -65,31 +56,37 @@ public class ContentHandlers {
 		return createContentHandler(systemID.toExternalForm());
 	}
 	
-	public static ContentHandler createContentHandler(Object o) {
-		if (o == null)
-			throw new IllegalArgumentException("can't create ContentHandler for null");
-		
-		if (o instanceof Result)
-			return createContentHandler((Result) o);
-		if (o instanceof File)
-			return createContentHandler((File) o);
-		if (o instanceof Writer)
-			return createContentHandler((Writer) o);
-		if (o instanceof OutputStream)
-			return createContentHandler((OutputStream) o);
-		if (o instanceof String)
-			return createContentHandler((String) o);
-		if (o instanceof URI)
-			return createContentHandler((URI) o);
-		if (o instanceof URL)
-			return createContentHandler((URL) o);
-		
-		throw new IllegalArgumentException("can't create ContentHandler for: " + o);
-	}
-	
 	public static ContentHandler createContentHandler(String systemID, OutputStream os) {
 		Result r = new StreamResult(os);
 		r.setSystemId(systemID);
 		return createContentHandler(r);
 	}
+	public static ContentHandler createContentHandler(String systemID, Writer w) {
+		Result r = new StreamResult(w);
+		r.setSystemId(systemID);
+		return createContentHandler(r);
+	}
+	
+//	public static ContentHandler createContentHandler(Object o) {
+//		if (null == o)
+//			throw new IllegalArgumentException("can't create ContentHandler for null");
+//		
+//		if (o instanceof Result)
+//			return createContentHandler((Result) o);
+//		if (o instanceof File)
+//			return createContentHandler((File) o);
+//		if (o instanceof Writer)
+//			return createContentHandler((Writer) o);
+//		if (o instanceof OutputStream)
+//			return createContentHandler((OutputStream) o);
+//		if (o instanceof String)
+//			return createContentHandler((String) o);
+//		if (o instanceof URI)
+//			return createContentHandler((URI) o);
+//		if (o instanceof URL)
+//			return createContentHandler((URL) o);
+//		
+//		throw new IllegalArgumentException(String.format(
+//				"can't create ContentHandler for %s (%s) ", o.getClass(), o));
+//	}
 }
