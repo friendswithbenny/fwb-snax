@@ -16,13 +16,16 @@ public class TestSnax {
 		XML1 = "<thing1 bar='jar' foo='bar'><thing2>thang</thing2><thing3 /></thing1>";
 	
 	/**
-	 * This "test" should fail, but doesn't; sadly, it passes if executed.
+	 * Sadly, this test fails.
+	 * It will pass if xmlunit ever fixes the bug,
+	 * but that's unlikely as it would be backwards-incompatible.
 	 * xmlunit's "similar" neglects child-order,
 	 * which is clearly a bug as child-order is semantically meaningful in XML.
+	 * "similar" is still preferred here, to ignore certain lexical details e.g. prefixes.
 	 */
 //	@Test
-	public void testXmlUnitBug() throws Exception {
-		assertXMLEqual("<thing1 bar='jar' foo='bar'><thing3 /><thing2>thang</thing2></thing1>", XML1);
+	public void testXmlUnitBugFixed() throws Exception {
+		assertXMLNotEqual("<thing1 bar='jar' foo='bar'><thing3 /><thing2>thang</thing2></thing1>", XML1);
 	}
 	
 	@Test
@@ -41,9 +44,9 @@ public class TestSnax {
 				sch.endElement();
 				sch.emptyElement("thing3");
 		sch.endAll();
-		
 		String xml = sw.toString();
-		LOG.debug("got xml: " + xml);
+		
+		LOG.debug("got xml {}", xml);
 		assertXMLEqual(XML1, xml);
 	}
 }
