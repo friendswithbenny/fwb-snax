@@ -1,5 +1,8 @@
 package org.fwb.xml.sax.snax;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.xml.XMLConstants;
 
 import org.xml.sax.Attributes;
@@ -12,10 +15,20 @@ public class SimpleAttributes extends AttributesImpl {
 	public static final String
 		CDATA = "CDATA";
 	
-	/** bulk add */
-	public void addAttributes(Attributes a) {
+	/**
+	 * bulk add
+	 * @return {@code this} for convenience
+	 */
+	public SimpleAttributes addAttributes(Attributes a) {
 		for (int i = 0; i < a.getLength(); ++i)
 			addAttribute(a.getURI(i), a.getLocalName(i), a.getQName(i), a.getType(i), a.getValue(i));
+		return this;
+	}
+	
+	/** bulk add namespace-free text attributes */
+	public void addAttributes(Map<String, ?> a) {
+		for (Entry<String, ?> e : a.entrySet())
+			addAttribute(e.getKey(), e.getValue());
 	}
 	
 	/** namespace-free attribute */
@@ -23,10 +36,10 @@ public class SimpleAttributes extends AttributesImpl {
 		addAttribute(XMLConstants.NULL_NS_URI, name, name, type, value);
 	}
 	
-	/** namespace-free, text attributes */
+	/** namespace-free, text attribute */
 	public void addAttribute(String name, Object value) {
 		String type = CDATA;
-		// TODO(benny)
+		// TODO
 //		if (value instanceof Number)
 //			type = "xs:decimal";
 //		if (value instanceof Boolean)

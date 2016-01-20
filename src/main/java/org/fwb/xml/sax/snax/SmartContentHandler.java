@@ -36,7 +36,11 @@ import org.xml.sax.SAXException;
  * in this case, getCurrentDataState() will run BEFORE the underlying startElement is ever run
  * 
  * in all cases, a call to <code>flush()</code> will always force any pending events to be sent
+ * 
+ * @deprecated it's official. i don't think this class is worth the trouble.
+ * @see SimpleAttributes#addAttributes(Map)
  */
+@Deprecated
 public class SmartContentHandler extends SimpleContentHandler {
 	/** serialization token for a QName, surprisingly absent from the QName api */
 	static String toName(QName qName) {
@@ -94,7 +98,8 @@ public class SmartContentHandler extends SimpleContentHandler {
 	 * Closes all open elements and the document.
 	 * @deprecated use of this method is not recommended; it is usually best-practice to self-balance
 	 */
-	public void endAll() throws SAXException {
+	@Deprecated
+	void endAll() throws SAXException {
 		while (! STACK.isEmpty()) {
 			endElement();
 		}
