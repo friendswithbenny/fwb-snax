@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.transform.sax.SAXSource;
 
@@ -29,7 +28,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public interface SnaxAble {
 	static final Logger LOG = LoggerFactory.getLogger(SnaxAble.class);
 	
-	void toSnax(SmartContentHandler sch) throws SAXException;
+	void toSnax(SimpleContentHandler sch) throws SAXException;
 	
 	class SnaxAdapter implements SnaxAble {
 		/**
@@ -67,13 +66,11 @@ public interface SnaxAble {
 		}
 		
 		@Override
-		public void toSnax(SmartContentHandler sch) throws SAXException {
-			sch.startElement(E.name());
-				for (Entry<String, String> e : E.atts().entrySet())
-					sch.addAttribute(e.getKey(), e.getValue());
+		public void toSnax(SimpleContentHandler sch) throws SAXException {
+			sch.startElement(E.name(), new SimpleAttributes().addAttributes(E.atts()));
 				for (SnaxAble kid : E.kids())
 					kid.toSnax(sch);
-			sch.endElement();
+			sch.endElement(E.name());
 		}
 		
 //		static class SnaxElementImpl implements SnaxElement {
@@ -183,10 +180,10 @@ class SnaxReader extends XMLFilterImpl {
 	
 	@Override
 	public void parse(InputSource is) throws SAXException, IOException {
-		LOG.debug("parse({})", is); // TODO trace
+		LOG.trace("parse({})", is);
 		
 		if (is instanceof SnaxInput) {
-			SmartContentHandler sch = new SmartContentHandler(getContentHandler());
+			SimpleContentHandler sch = new SimpleContentHandler(getContentHandler());
 			sch.startDocument();
 			((SnaxInput) is).X.toSnax(sch);
 			sch.endDocument();

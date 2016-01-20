@@ -15,20 +15,20 @@ public class SimpleAttributes extends AttributesImpl {
 	public static final String
 		CDATA = "CDATA";
 	
-	/**
-	 * bulk add
-	 * @return {@code this} for convenience
-	 */
-	public SimpleAttributes addAttributes(Attributes a) {
+	/** bulk add */
+	public void addAttributes(Attributes a) {
 		for (int i = 0; i < a.getLength(); ++i)
 			addAttribute(a.getURI(i), a.getLocalName(i), a.getQName(i), a.getType(i), a.getValue(i));
-		return this;
 	}
 	
-	/** bulk add namespace-free text attributes */
-	public void addAttributes(Map<String, ?> a) {
+	/**
+	 * bulk add namespace-free text attributes
+	 * @return {@code this} for convenience
+	 */
+	public SimpleAttributes addAttributes(Map<String, ?> a) {
 		for (Entry<String, ?> e : a.entrySet())
 			addAttribute(e.getKey(), e.getValue());
+		return this;
 	}
 	
 	/** namespace-free attribute */

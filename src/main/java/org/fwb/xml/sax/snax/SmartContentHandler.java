@@ -37,8 +37,7 @@ import org.xml.sax.SAXException;
  * 
  * in all cases, a call to <code>flush()</code> will always force any pending events to be sent
  * 
- * @deprecated it's official. i don't think this class is worth the trouble.
- * @see SimpleAttributes#addAttributes(Map)
+ * @deprecated prefer {@link SimpleContentHandler} to this ultra-stateful sugar
  */
 @Deprecated
 public class SmartContentHandler extends SimpleContentHandler {
