@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
  * it is fair enough, as JAXB is (nobly) intended for static schema facilities as well.
  * one day hopefully I can revisit JAXB more seriously.
  */
-public class TestJaxbAble {
-	static final Logger LOG = LoggerFactory.getLogger(TestJaxbAble.class);
+public class TestJaxb {
+	static final Logger LOG = LoggerFactory.getLogger(TestJaxb.class);
 	
 	static final JAXBContext JC;
 	static {
