@@ -22,8 +22,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  * this unfortunately only supports primitive (type-free, namespace-free) XML for the time being.
  * TODO allow types other than String, including QName?
- * 
- * @deprecated I'm hoping this can just be replaced with pure (non-pojo-bound) JAXBElements.
  */
 public interface SnaxAble {
 	static final Logger LOG = LoggerFactory.getLogger(SnaxAble.class);

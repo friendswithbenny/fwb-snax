@@ -1,11 +1,14 @@
 package org.fwb.xml.sax.snax;
 
 import java.io.StringWriter;
+import java.util.LinkedHashMap;
 
 import org.fwb.xml.sax.ContentHandlers;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.AssertionFailedError;
 
 import static org.custommonkey.xmlunit.XMLAssert.*;
 
@@ -22,14 +25,48 @@ public class TestSnax {
 	 * xmlunit's "similar" neglects child-order,
 	 * which is clearly a bug as child-order is semantically meaningful in XML.
 	 * "similar" is still preferred here, to ignore certain lexical details e.g. prefixes.
+	 * 
+	 * TODO remove the expected-exception once they fix the bug
 	 */
-//	@Test
+	@Test
+		(expected=AssertionFailedError.class) // TODO remove when fixed
 	public void testXmlUnitBugFixed() throws Exception {
 		assertXMLNotEqual("<thing1 bar='jar' foo='bar'><thing3 /><thing2>thang</thing2></thing1>", XML1);
 	}
 	
 	@Test
-	public void testX() throws Exception {
+	public void testSimple() throws Exception {
+		StringWriter sw = new StringWriter();
+		SimpleContentHandler sch = new SimpleContentHandler(ContentHandlers.createContentHandler(sw));
+		
+		sch.startDocument();
+			sch.startElement("thing1",
+					new SimpleAttributes().addAttributes(new LinkedHashMap<String, String>() {
+						/** @deprecated default */
+						private static final long serialVersionUID = 1L;
+						
+						{
+							put("foo", "bar");
+							put("bar", "jar");
+						}
+					}));
+				
+				sch.startElement("thing2");
+					sch.characters("thang");
+				sch.endElement("thing2");
+				
+				sch.emptyElement("thing3");
+			sch.endElement("thing1");
+		sch.endDocument();
+		String xml = sw.toString();
+		
+		LOG.debug("got xml {}", xml);
+		assertXMLEqual(XML1, xml);
+	}
+	
+	@Test
+	@SuppressWarnings("deprecation")
+	public void testSmartDeprecated() throws Exception {
 		// a rare bird, this would actually be a good case for fancy mockito (to mock ContentHandler).
 		// that said, plain XML testing is good "enough" so i stick to what's familiar.
 		
