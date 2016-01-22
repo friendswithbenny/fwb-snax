@@ -6,7 +6,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -63,6 +69,15 @@ public class TestSnaxAble {
 		}
 	};
 	
+	static final SnaxSource SRC = new SnaxSource(
+			new ElementSnaxAble(new SnaxElementImpl(NAME, ATTS, Arrays.<SnaxAble>asList(
+					new ElementSnaxAble(new SnaxElementImpl(
+							CHILD1NAME, CHILD1ATTS, Collections.<SnaxAble>emptySet()
+					)),
+					CHILD2
+			)))
+	);
+	
 	static final String EXPECTED = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><theElementName firstAtt=\"thirteen\" secondAttribution=\"some value\">"
 			+ System.lineSeparator() + "<firstborn nationality=\"egyptian\" gender=\"masculine\"/>"
 			+ System.lineSeparator() + "<theSecondChild hair=\"blonde\" type=\"snazzy snax able\">some char broil too</theSecondChild>"
@@ -82,19 +97,62 @@ public class TestSnaxAble {
 //		t.setOutputProperty(OutputKeys.STANDALONE, "yes");
 		
 		StringWriter sw = new StringWriter();
-		t.transform(
-				new SnaxSource(
-						new ElementSnaxAble(new SnaxElementImpl(NAME, ATTS, Arrays.<SnaxAble>asList(
-								new ElementSnaxAble(new SnaxElementImpl(
-										CHILD1NAME, CHILD1ATTS, Collections.<SnaxAble>emptySet()
-								)),
-								CHILD2
-						)))
-				),
-				new StreamResult(sw));
+		t.transform(SRC, new StreamResult(sw));
 		
 		LOG.debug(EXPECTED);
 		LOG.debug(sw.toString());
 		Assert.assertEquals(EXPECTED, sw.toString());
+	}
+	
+	/* testing JAXB compatibility below */
+	
+	static final JAXBContext JC;
+	static {
+		try {
+			JC = JAXBContext.newInstance(JaxbThing.class);
+		} catch (JAXBException e) {
+			throw new Error("never happens", e);
+		}
+	}
+	static Marshaller marshaller() {
+		try {
+			Marshaller retVal = JC.createMarshaller();
+			retVal.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			retVal.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+			return retVal;
+		} catch (JAXBException e) {
+			throw new Error("never happens", e);
+		}
+	}
+	/**
+	 * with great sadness, I decide for now JAXB is not in fact compatible.
+	 * 
+	 * this post suggests directly using JAXB unmarshaller to build a JAXBElement,
+	 * but I find that response unsatisfactory.
+	 * (http://blog.bdoughan.com/2013/03/jaxb-and-javautilmap.html)
+	 * (from http://stackoverflow.com/questions/26232916/jaxb-adapter-which-return-xml-node-or-raw-xml-text-instead-object)
+	 * 
+	 * TODO research marshaller and unmarshaller more. this may merit a customization at that level.
+	 */
+	@Test
+	public void test2JaxbCompatible() throws Exception {
+		StringWriter sw = new StringWriter();
+		marshaller().marshal(new JaxbThing(), sw);
+		LOG.debug(sw.toString());
+		
+		// ridiculous at first, but I guess @XmlValue means unparsed content or something,
+		// which in this case appeared binary and was converted to hex?
+		String hilarious = "<bennytesty>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48dGhlRWxlbWVudE5hbWUgZmlyc3RBdHQ9InRoaXJ0ZWVuIiBzZWNvbmRBdHRyaWJ1dGlvbj0ic29tZSB2YWx1ZSI+PGZpcnN0Ym9ybiBuYXRpb25hbGl0eT0iZWd5cHRpYW4iIGdlbmRlcj0ibWFzY3VsaW5lIi8+PHRoZVNlY29uZENoaWxkIGhhaXI9ImJsb25kZSIgdHlwZT0ic25henp5IHNuYXggYWJsZSI+c29tZSBjaGFyIGJyb2lsIHRvbzwvdGhlU2Vjb25kQ2hpbGQ+PC90aGVFbGVtZW50TmFtZT4=</bennytesty>";
+		Assert.assertEquals(hilarious, sw.toString());
+	}
+	
+	@XmlRootElement(name="bennytesty")
+	public static class JaxbThing {
+		@XmlValue
+		Source xxx = SRC;
+		
+		public String toString() {
+			return "but no, really, look. i'm some other type of object!";
+		}
 	}
 }
