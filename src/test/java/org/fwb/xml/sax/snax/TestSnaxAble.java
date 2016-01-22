@@ -11,7 +11,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
-import org.fwb.xml.sax.snax.SnaxAble.SnaxAdapter;
+import org.fwb.xml.sax.snax.SnaxAble.SnaxElement.ElementSnaxAble;
+import org.fwb.xml.sax.snax.SnaxAble.SnaxElement.SnaxElementImpl;
 import org.fwb.xml.sax.snax.SnaxAble.SnaxSource;
 import org.fwb.xml.trax.LogErrorListener;
 import org.junit.Assert;
@@ -82,9 +83,14 @@ public class TestSnaxAble {
 		
 		StringWriter sw = new StringWriter();
 		t.transform(
-				new SnaxSource(new SnaxAdapter(NAME, ATTS, Arrays.<SnaxAble>asList(
-						new SnaxAdapter(CHILD1NAME, CHILD1ATTS, Collections.<SnaxAble>emptySet()),
-						CHILD2))),
+				new SnaxSource(
+						new ElementSnaxAble(new SnaxElementImpl(NAME, ATTS, Arrays.<SnaxAble>asList(
+								new ElementSnaxAble(new SnaxElementImpl(
+										CHILD1NAME, CHILD1ATTS, Collections.<SnaxAble>emptySet()
+								)),
+								CHILD2
+						)))
+				),
 				new StreamResult(sw));
 		
 		LOG.debug(EXPECTED);

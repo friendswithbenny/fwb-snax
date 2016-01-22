@@ -28,76 +28,65 @@ public interface SnaxAble {
 	
 	void toSnax(SimpleContentHandler sch) throws SAXException;
 	
-	class SnaxAdapter implements SnaxAble {
-		/**
-		 * a flat (single-element name and attribute)
-		 * and recursive (child-list) approach to serialization
-		 */
-		interface SnaxElement {
-			String name();
-			Map<String, String> atts();
-			Collection<SnaxAble> kids();
-		}
-		
-		final SnaxElement E;
-		SnaxAdapter(SnaxElement e) {
-			E = e;
-		}
-		
-		SnaxAdapter(
-				final String name, final Map<String, String> atts,
-				final Collection<SnaxAble> kids) {
-			this(new SnaxElement() {
-				@Override
-				public String name() {
-					return name;
-				}
-				@Override
-				public Map<String, String> atts() {
-					return atts;
-				}
-				@Override
-				public Collection<SnaxAble> kids() {
-					return kids;
-				}
-			});
-		}
-		
-		@Override
-		public void toSnax(SimpleContentHandler sch) throws SAXException {
-			sch.startElement(E.name(), new SimpleAttributes().addAttributes(E.atts()));
-				for (SnaxAble kid : E.kids())
-					kid.toSnax(sch);
-			sch.endElement(E.name());
-		}
-		
-//		static class SnaxElementImpl implements SnaxElement {
-//			final String NAME;
-//			final Map<String, String> ATTS;
-//			final Collection<SnaxAble> KIDS;
-//			SnaxElementImpl(String name, Map<String, String> atts, Collection<SnaxAble> kids) {
-//				NAME = name;
-//				ATTS = atts;
-//				KIDS = kids;
-//			}
-//			public String name() {
-//				return NAME;
-//			}
-//			public Map<String, String> atts() {
-//				return ATTS;
-//			}
-//			public Collection<SnaxAble> kids() {
-//				return KIDS;
-//			}
-//		}
-	}
-	
 	class SnaxSource extends SAXSource {
 		SnaxSource(SnaxAble x) {
 			super(new SnaxReader(), new SnaxInput(x));
 		}
 		SnaxSource(SnaxAble x, XMLReader r) {
 			super(new SnaxReader(r), new SnaxInput(x));
+		}
+	}
+	
+	/**
+	 * a utility interface, this allows an implementation to represent itself as
+	 * a flat, single-element name and attribute-set, along with recursive child-list.
+	 * 
+	 * @see SnaxAdapter
+	 */
+	interface SnaxElement {
+		String name();
+		Map<String, String> atts();
+		Collection<SnaxAble> kids();
+		
+		/** immutable data implementation */
+		class SnaxElementImpl implements SnaxElement {
+			final String NAME;
+			final Map<String, String> ATTS;
+			final Collection<SnaxAble> KIDS;
+			SnaxElementImpl(String name, Map<String, String> atts, Collection<SnaxAble> kids) {
+				NAME = name;
+				ATTS = atts;
+				KIDS = kids; // TODO ImmutableList.copyOf?
+			}
+			
+			@Override
+			public String name() {
+				return NAME;
+			}
+			@Override
+			public Map<String, String> atts() {
+				return ATTS;
+			}
+			@Override
+			public Collection<SnaxAble> kids() {
+				return KIDS;
+			}
+		}
+		
+		/** an adapter, mapping from SnaxElement to SnaxAble */
+		class ElementSnaxAble implements SnaxAble {
+			final SnaxElement E;
+			ElementSnaxAble(SnaxElement e) {
+				E = e;
+			}
+			
+			@Override
+			public void toSnax(SimpleContentHandler sch) throws SAXException {
+				sch.startElement(E.name(), new SimpleAttributes().addAttributes(E.atts()));
+					for (SnaxAble kid : E.kids())
+						kid.toSnax(sch);
+				sch.endElement(E.name());
+			}
 		}
 	}
 }
