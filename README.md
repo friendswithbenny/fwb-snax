@@ -19,3 +19,10 @@ SNAX presents an API layer for the most common usage of XML, a simpler sub-set o
 * SimpleContentHandler provides simplified methods for null namespace, attributes, and content, interchangeably.
 * SmartContentHandler provides further-simplified methods to add attributes and close tags,
 at the expense of keeping stateful information such as a stack of open elements and their attributes.
+
+## other
+
+In addition to the simplified SNAX API and bridge-implementation,
+this project contains other more general utilities for processing XML in Java,
+such as default implementations of some of the more arcane interfaces (like Error Handlers and Listeners),
+and a few design patterns such as Delegate implementations and algebraic (Guava) adapters.

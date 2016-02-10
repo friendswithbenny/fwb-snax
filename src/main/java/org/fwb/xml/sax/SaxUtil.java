@@ -10,16 +10,26 @@ import javax.xml.transform.Result;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.stream.StreamResult;
 
+import org.fwb.xml.trax.TraxUtil;
 import org.xml.sax.ContentHandler;
 
-/** utility methods for creating plain/regular (non-SNAX) SAX ContentHandlers (non-Simple, non-Smart) */
-public class ContentHandlers {
-	static final SAXTransformerFactory STF = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+import static org.fwb.xml.trax.TraxUtil.result;
+
+/**
+ * utility methods for creating plain/regular (non-SNAX) SAX ContentHandlers (non-Simple, non-Smart).
+ */
+public class SaxUtil {
+	/** @deprecated static utilities only */
+	@Deprecated
+	private SaxUtil() { }
 	
+	static final SAXTransformerFactory STF = TraxUtil.newSaxTransformerFactory();
 	/**
-	 * creates a ContentHandler whose events are sent to the given Result
+	 * creates a ContentHandler whose events are sent to the given Result.
+	 * 
+	 * this is essentially a bridge from TrAX to SAX.
+	 * 
 	 * @param r the Result to which to send all events on the returned ContentHandler
 	 * @return an instance of TransformerHandler (i.e. NOT SimpleContentHandler)
 	 */
@@ -28,6 +38,7 @@ public class ContentHandlers {
 		try {
 			retVal = STF.newTransformerHandler();
 		} catch (TransformerConfigurationException e) {
+			// identity transformer should never fail
 			throw new Error("never happens", e);
 		}
 		retVal.setResult(r);
@@ -35,19 +46,19 @@ public class ContentHandlers {
 	}
 	
 	public static ContentHandler createContentHandler(File f) {
-		return createContentHandler(new StreamResult(f));
+		return createContentHandler(result(f));
 	}
 	/** @see #createContentHandler(String, OutputStream) */
 	public static ContentHandler createContentHandler(OutputStream os) {
-		return createContentHandler(new StreamResult(os));
+		return createContentHandler(result(os));
 	}
 	/** @see #createContentHandler(String, Writer) */
 	public static ContentHandler createContentHandler(Writer w) {
-		return createContentHandler(new StreamResult(w));
+		return createContentHandler(result(w));
 	}
 	
 	public static ContentHandler createContentHandler(String systemID) {
-		return createContentHandler(new StreamResult(systemID));
+		return createContentHandler(result(systemID));
 	}
 	public static ContentHandler createContentHandler(URI systemID) {
 		return createContentHandler(systemID.toString());
@@ -57,15 +68,23 @@ public class ContentHandlers {
 	}
 	
 	public static ContentHandler createContentHandler(String systemID, OutputStream os) {
-		Result r = new StreamResult(os);
-		r.setSystemId(systemID);
-		return createContentHandler(r);
+		return createContentHandler(result(systemID, os));
 	}
 	public static ContentHandler createContentHandler(String systemID, Writer w) {
-		Result r = new StreamResult(w);
-		r.setSystemId(systemID);
-		return createContentHandler(r);
+		return createContentHandler(result(systemID, w));
 	}
+	
+//	/**
+//	 * An alternative approach; XMLSerializer implements ContentHandler too.
+//	 */
+//	public static XMLSerializer createXmlSerializer(OutputStream os) {
+//		XMLSerializer ser = new XMLSerializer(os, null);
+//		
+//		// historically, this call was required to initialize the serializer
+//		ser.asContentHandler();		// IOException
+//		
+//		return ser;
+//	}
 	
 //	public static ContentHandler createContentHandler(Object o) {
 //		if (null == o)

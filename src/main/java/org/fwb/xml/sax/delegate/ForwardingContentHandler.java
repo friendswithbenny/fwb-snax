@@ -12,12 +12,13 @@ public abstract class ForwardingContentHandler implements ContentHandler {
 		public FixedForwardingContentHandler(ContentHandler delegate) {
 			this.delegate = delegate;
 		}
+		@Override
 		public ContentHandler delegate() {
 			return delegate;
 		}
 	}
 	
-	public abstract ContentHandler delegate();
+	protected abstract ContentHandler delegate();
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {

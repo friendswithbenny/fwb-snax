@@ -3,7 +3,7 @@ package org.fwb.xml.sax.snax;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 
-import org.fwb.xml.sax.ContentHandlers;
+import org.fwb.xml.sax.SaxUtil;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class TestSnax {
 	@Test
 	public void testSimple() throws Exception {
 		StringWriter sw = new StringWriter();
-		SimpleContentHandler sch = new SimpleContentHandler(ContentHandlers.createContentHandler(sw));
+		SimpleContentHandler sch = new SimpleContentHandler(SaxUtil.createContentHandler(sw));
 		
 		sch.startDocument();
 			sch.startElement("thing1",
@@ -71,7 +71,7 @@ public class TestSnax {
 		// that said, plain XML testing is good "enough" so i stick to what's familiar.
 		
 		StringWriter sw = new StringWriter();
-		SmartContentHandler sch = new SmartContentHandler(ContentHandlers.createContentHandler(sw));
+		SmartContentHandler sch = new SmartContentHandler(SaxUtil.createContentHandler(sw));
 		sch.startDocument();
 			sch.startElement("thing1");
 				sch.addAttribute("foo", "bar");

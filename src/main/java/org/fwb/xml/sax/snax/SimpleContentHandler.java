@@ -5,7 +5,7 @@ import java.io.File;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 
-import org.fwb.xml.sax.ContentHandlers;
+import org.fwb.xml.sax.SaxUtil;
 import org.fwb.xml.sax.delegate.ForwardingContentHandler.FixedForwardingContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -72,13 +72,13 @@ public class SimpleContentHandler extends FixedForwardingContentHandler {
 	}
 	
 	public SimpleContentHandler(Result r) {
-		this(ContentHandlers.createContentHandler(r));
+		this(SaxUtil.createContentHandler(r));
 	}
 	public SimpleContentHandler(File f) {
-		this(ContentHandlers.createContentHandler(f));
+		this(SaxUtil.createContentHandler(f));
 	}
 	public SimpleContentHandler(String systemID) {
-		this(ContentHandlers.createContentHandler(systemID));
+		this(SaxUtil.createContentHandler(systemID));
 	}
 	
 	/* namespace-free element (namespace-free is the default, hereafter) */

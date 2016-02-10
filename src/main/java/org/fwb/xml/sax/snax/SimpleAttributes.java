@@ -48,4 +48,56 @@ public class SimpleAttributes extends AttributesImpl {
 //			type = "xs:dateTime";
 		addAttribute(name, value == null ? "" : value.toString(), type);
 	}
+	
+	/** OCD. an immutable singleton of the empty-set of Attributes */
+	public static final Attributes EMPTY_ATTS = new Attributes() {
+		@Override
+		public int getLength() {
+			return 0;
+		}
+		@Override
+		public String getURI(int index) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+		@Override
+		public String getLocalName(int index) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+		@Override
+		public String getQName(int index) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+		@Override
+		public String getType(int index) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+		@Override
+		public String getValue(int index) {
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+		@Override
+		public int getIndex(String uri, String localName) {
+			return -1;
+		}
+		@Override
+		public int getIndex(String qName) {
+			return -1;
+		}
+		@Override
+		public String getType(String uri, String localName) {
+			return null;
+		}
+		@Override
+		public String getType(String qName) {
+			return null;
+		}
+		@Override
+		public String getValue(String uri, String localName) {
+			return null;
+		}
+		@Override
+		public String getValue(String qName) {
+			return null;
+		}
+	};
 }

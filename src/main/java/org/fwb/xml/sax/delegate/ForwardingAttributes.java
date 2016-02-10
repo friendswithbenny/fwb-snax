@@ -9,6 +9,7 @@ public abstract class ForwardingAttributes implements Attributes {
 		public FixedForwardingAttributes(Attributes delegate) {
 			this.delegate = delegate;
 		}
+		@Override
 		public Attributes delegate() {
 			return delegate;
 		}

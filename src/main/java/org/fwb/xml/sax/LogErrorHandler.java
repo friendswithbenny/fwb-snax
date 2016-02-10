@@ -24,7 +24,7 @@ public final class LogErrorHandler implements ErrorHandler {
 	}
 	
 	@Override
-	public final void warning(SAXParseException e) throws SAXException {
+	public final void warning(SAXParseException e) {
 		LOG.warn(e.toString(), e);
 	}
 	@Override

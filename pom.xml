@@ -19,31 +19,48 @@
 		</developer>
 	</developers>
 	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
+		<slf4j.version>1.7.13</slf4j.version>
+		<guava.version>19.0</guava.version>
+		
+		<!-- test -->
+		<junit.version>4.12</junit.version>
+		<xmlunit.version>1.6</xmlunit.version>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.13</version>
+			<version>${slf4j.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
 		</dependency>
 		
 		<!-- implementations -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.13</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		
 		<!-- test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
-			<version>1.6</version>
+			<version>${xmlunit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

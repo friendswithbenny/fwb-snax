@@ -34,7 +34,7 @@ public class LogErrorListener implements ErrorListener {
 	}
 	
 	@Override
-	public void warning(TransformerException e) throws TransformerException {
+	public void warning(TransformerException e) {
 		LOG.warn(e.toString(), e);
 	}
 	@Override
