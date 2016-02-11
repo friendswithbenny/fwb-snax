@@ -11,6 +11,9 @@ public class SubAttributes implements Attributes {
 	final Attributes A;
 	final int BEGIN, LENGTH;
 	
+	public SubAttributes(Attributes a, int beginIndex) {
+		this(a, beginIndex, a.getLength() - beginIndex);
+	}
 	/**
 	 * @param a the attributes to sub-set
 	 * @param beginIndex the first index, inclusive
@@ -22,6 +25,7 @@ public class SubAttributes implements Attributes {
 		LENGTH = length;
 		
 		Preconditions.checkPositionIndex(BEGIN + LENGTH, A.getLength());
+		// TODO more validations
 	}
 	
 	/* index mapping */

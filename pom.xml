@@ -22,6 +22,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
+		<fwb.col.version>1.0-SNAPSHOT</fwb.col.version>
+		
 		<slf4j.version>1.7.13</slf4j.version>
 		<guava.version>19.0</guava.version>
 		
@@ -31,6 +33,12 @@
 	</properties>
 	
 	<dependencies>
+		<dependency>
+			<groupId>org.fwb</groupId>
+			<artifactId>fwb-col</artifactId>
+			<version>${fwb.col.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

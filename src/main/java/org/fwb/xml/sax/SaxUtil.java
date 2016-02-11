@@ -6,13 +6,24 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.fwb.xml.trax.TraxUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 
 import static org.fwb.xml.trax.TraxUtil.result;
 
@@ -23,6 +34,49 @@ public class SaxUtil {
 	/** @deprecated static utilities only */
 	@Deprecated
 	private SaxUtil() { }
+	
+	static final Logger LOG = LoggerFactory.getLogger(SaxUtil.class);
+	
+	static final SAXParserFactory SPF = SAXParserFactory.newInstance();
+	static SAXParser newSAXParser() {
+		try {
+			return SPF.newSAXParser();
+		} catch (ParserConfigurationException e) {
+			throw new Error("never happens");
+		} catch (SAXException e) {
+			throw new Error("never happens");
+		}
+	}
+	public static XMLReader newXMLReader() {
+		SAXParser sp = newSAXParser();
+		try {
+			return sp.getXMLReader();
+		} catch (SAXException e) {
+			throw new Error("never happens");
+		}
+	}
+	
+	public static final String
+		/** default data-type for XML values */
+		CDATA = "CDATA",
+		/** XMLReader property to set LexicalHandler */
+		PROP_LEXICAL_HANDLER = "http://xml.org/sax/properties/lexical-handler";
+	
+	public static void setContentHandlerMaybeLexicalHandler(XMLReader r, ContentHandler ch) {
+		r.setContentHandler(ch);
+		if (ch instanceof LexicalHandler)
+			try {
+				r.setProperty(PROP_LEXICAL_HANDLER, ch);
+			} catch (SAXNotRecognizedException e) {
+				LOG.warn(
+						String.format("LexicalHandler (%s) ignored. unsupported by (%s)", ch, r),
+						e);
+			} catch (SAXNotSupportedException e) {
+				LOG.warn(
+						String.format("LexicalHandler (%s) ignored. unsupported by (%s)", ch, r),
+						e);
+			}
+	}
 	
 	static final SAXTransformerFactory STF = TraxUtil.newSaxTransformerFactory();
 	/**
@@ -73,6 +127,60 @@ public class SaxUtil {
 	public static ContentHandler createContentHandler(String systemID, Writer w) {
 		return createContentHandler(result(systemID, w));
 	}
+	
+	/** OCD: high-performance immutable+empty attributes singleton */
+	public static final Attributes EMPTY_ATTS =
+//			new AttributesImpl();	// alternative free approach
+			new Attributes() {
+				@Override
+				public int getLength() {
+					return 0;
+				}
+				@Override
+				public String getURI(int index) {
+					return null;
+				}
+				@Override
+				public String getLocalName(int index) {
+					return null;
+				}
+				@Override
+				public String getQName(int index) {
+					return null;
+				}
+				@Override
+				public String getType(int index) {
+					return null;
+				}
+				@Override
+				public String getValue(int index) {
+					return null;
+				}
+				@Override
+				public int getIndex(String uri, String localName) {
+					return -1;
+				}
+				@Override
+				public int getIndex(String qName) {
+					return -1;
+				}
+				@Override
+				public String getType(String uri, String localName) {
+					return null;
+				}
+				@Override
+				public String getType(String qName) {
+					return null;
+				}
+				@Override
+				public String getValue(String uri, String localName) {
+					return null;
+				}
+				@Override
+				public String getValue(String qName) {
+					return null;
+				}
+			};
 	
 //	/**
 //	 * An alternative approach; XMLSerializer implements ContentHandler too.

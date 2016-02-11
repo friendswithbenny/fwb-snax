@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.AssertionFailedError;
 
-import static org.custommonkey.xmlunit.XMLAssert.*;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
 
 public class TestSnax {
 	private static final Logger LOG = LoggerFactory.getLogger(TestSnax.class);

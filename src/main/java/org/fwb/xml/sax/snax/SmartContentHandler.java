@@ -41,6 +41,10 @@ import org.xml.sax.SAXException;
  */
 @Deprecated
 public class SmartContentHandler extends SimpleContentHandler {
+	public static SmartContentHandler of(ContentHandler ch) {
+		return (ch instanceof SmartContentHandler) ? (SmartContentHandler) ch : new SmartContentHandler(ch);
+	}
+	
 	/** serialization token for a QName, surprisingly absent from the QName api */
 	static String toName(QName qName) {
 		if (null == qName)

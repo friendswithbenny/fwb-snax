@@ -25,48 +25,10 @@ import org.xml.sax.SAXException;
  * @see com.google.common.collect.ForwardingObject
  */
 public class SimpleContentHandler extends FixedForwardingContentHandler {
-	/** high-performance immutable+empty attributes singleton */
-	public static final Attributes EMPTY_ATTRIBUTES =
-//		new AttributesImpl();	// alternative free approach
-		new Attributes() {
-			public int getIndex(String s, String s1) {
-				return -1;
-			}
-			public int getIndex(String s) {
-				return -1;
-			}
-			public int getLength() {
-				return 0;
-			}
-			public String getLocalName(int i) {
-				return null;
-			}
-			public String getQName(int i) {
-				return null;
-			}
-			public String getType(int i) {
-				return null;
-			}
-			public String getType(String s, String s1) {
-				return null;
-			}
-			public String getType(String s) {
-				return null;
-			}
-			public String getURI(int i) {
-				return null;
-			}
-			public String getValue(int i) {
-				return null;
-			}
-			public String getValue(String s, String s1) {
-				return null;
-			}
-			public String getValue(String s) {
-				return null;
-			}
-		};
-
+	public static SimpleContentHandler of(ContentHandler ch) {
+		return (ch instanceof SimpleContentHandler) ? (SimpleContentHandler) ch : new SimpleContentHandler(ch);
+	}
+	
 	public SimpleContentHandler(ContentHandler delegate) {
 		super(delegate);
 	}
@@ -94,7 +56,7 @@ public class SimpleContentHandler extends FixedForwardingContentHandler {
 	/* empty element */
 	/** empty element, attribute-free */
 	public void emptyElement(String name) throws SAXException {
-		emptyElement(name, EMPTY_ATTRIBUTES);
+		emptyElement(name, SaxUtil.EMPTY_ATTS);
 	}
 	/** empty element with attributes */
 	public void emptyElement(String name, Attributes atts) throws SAXException {
@@ -110,11 +72,11 @@ public class SimpleContentHandler extends FixedForwardingContentHandler {
 	/* attribute-free element */
 	/** attribute-free element */
 	public void startElement(String name) throws SAXException {
-		startElement(name, EMPTY_ATTRIBUTES);
+		startElement(name, SaxUtil.EMPTY_ATTS);
 	}
 	/** attribute-free element with namespace */
 	public void startElement(String uri, String localName, String qName) throws SAXException {
-		startElement(uri, localName, qName, EMPTY_ATTRIBUTES);
+		startElement(uri, localName, qName, SaxUtil.EMPTY_ATTS);
 	}
 	
 	/* simplified implementations */
