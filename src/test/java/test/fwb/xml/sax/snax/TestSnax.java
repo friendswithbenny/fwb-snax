@@ -1,9 +1,12 @@
-package org.fwb.xml.sax.snax;
+package test.fwb.xml.sax.snax;
 
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 
 import org.fwb.xml.sax.SaxUtil;
+import org.fwb.xml.sax.snax.SimpleAttributes;
+import org.fwb.xml.sax.snax.SimpleContentHandler;
+import org.fwb.xml.sax.snax.SmartContentHandler;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +19,7 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
 public class TestSnax {
 	private static final Logger LOG = LoggerFactory.getLogger(TestSnax.class);
 	
-	static final String
+	public static final String
 		XML1 = "<thing1 bar='jar' foo='bar'><thing2>thang</thing2><thing3 /></thing1>";
 	
 	/**
@@ -59,29 +62,6 @@ public class TestSnax {
 				sch.emptyElement("thing3");
 			sch.endElement("thing1");
 		sch.endDocument();
-		String xml = sw.toString();
-		
-		LOG.debug("got xml {}", xml);
-		assertXMLEqual(XML1, xml);
-	}
-	
-	@Test
-	@SuppressWarnings("deprecation")
-	public void testSmartDeprecated() throws Exception {
-		// a rare bird, this would actually be a good case for fancy mockito (to mock ContentHandler).
-		// that said, plain XML testing is good "enough" so i stick to what's familiar.
-		
-		StringWriter sw = new StringWriter();
-		SmartContentHandler sch = new SmartContentHandler(SaxUtil.createContentHandler(sw));
-		sch.startDocument();
-			sch.startElement("thing1");
-				sch.addAttribute("foo", "bar");
-				sch.addAttribute("bar", "jar");
-				sch.startElement("thing2");
-					sch.characters("thang");
-				sch.endElement();
-				sch.emptyElement("thing3");
-		sch.endAll();
 		String xml = sw.toString();
 		
 		LOG.debug("got xml {}", xml);

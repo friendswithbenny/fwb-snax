@@ -27,6 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+/**
+ * TODO confirm this approach and publicize necessary components in {@link SnaxAble},
+ * then move this test to the "test." package.
+ */
 public class TestSnaxAble {
 	static final Logger LOG = LoggerFactory.getLogger(TestSnaxAble.class);
 	

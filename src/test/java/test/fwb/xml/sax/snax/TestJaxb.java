@@ -1,4 +1,4 @@
-package org.fwb.xml.sax.snax;
+package test.fwb.xml.sax.snax;
 
 import java.io.StringWriter;
 
