@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>org.fwb</groupId>
+	<groupId>org.friendswithbenny</groupId>
 	<artifactId>fwb-snax</artifactId>
 	<version>1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -22,7 +22,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<fwb.col.version>1.0-SNAPSHOT</fwb.col.version>
+		<fwb.alj.version>1.0-SNAPSHOT</fwb.alj.version>
 		
 		<slf4j.version>1.7.13</slf4j.version>
 		<guava.version>19.0</guava.version>
@@ -35,9 +35,9 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.fwb</groupId>
-			<artifactId>fwb-col</artifactId>
-			<version>${fwb.col.version}</version>
+			<groupId>org.friendswithbenny</groupId>
+			<artifactId>fwb-alj</artifactId>
+			<version>${fwb.alj.version}</version>
 		</dependency>
 		
 		<dependency>
