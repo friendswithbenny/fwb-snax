@@ -45,6 +45,7 @@ public final class NodeListList<T extends Node> extends AbstractList<T> {
 	 * but hopefully no longer needed
 	 */
 	@Deprecated
+	@SuppressWarnings("unchecked")
 	static final <T extends Node> List<T> wrap(Object o) {
 		Preconditions.checkNotNull(o, "cannot wrap(null)");
 		

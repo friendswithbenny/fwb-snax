@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import org.fwb.xml.sax.SaxUtil;
 import org.fwb.xml.sax.snax.SimpleAttributes;
 import org.fwb.xml.sax.snax.SimpleContentHandler;
-import org.fwb.xml.sax.snax.SmartContentHandler;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
