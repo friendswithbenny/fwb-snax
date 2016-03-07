@@ -3,7 +3,6 @@ package org.fwb.xml.sax.snax;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.transform.sax.SAXSource;
@@ -16,6 +15,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 
 /**
  * an interface for XML serialization, and some adapters.
@@ -46,14 +48,14 @@ public interface SnaxAble {
 	interface SnaxElement {
 		String name();
 		Map<String, String> atts();
-		Collection<SnaxAble> kids();
+		Iterable<SnaxAble> kids();
 		
 		/** immutable data implementation */
 		class SnaxElementImpl implements SnaxElement {
 			final String NAME;
 			final Map<String, String> ATTS;
-			final Collection<SnaxAble> KIDS;
-			SnaxElementImpl(String name, Map<String, String> atts, Collection<SnaxAble> kids) {
+			final Iterable<SnaxAble> KIDS;
+			public SnaxElementImpl(String name, Map<String, String> atts, Iterable<SnaxAble> kids) {
 				NAME = name;
 				ATTS = atts;
 				KIDS = kids; // TODO ImmutableList.copyOf?
@@ -68,15 +70,23 @@ public interface SnaxAble {
 				return ATTS;
 			}
 			@Override
-			public Collection<SnaxAble> kids() {
+			public Iterable<SnaxAble> kids() {
 				return KIDS;
 			}
 		}
 		
 		/** an adapter, mapping from SnaxElement to SnaxAble */
 		class ElementSnaxAble implements SnaxAble {
+			public static final Function<SnaxElement, SnaxAble> ELEMENT_SNAXABLE =
+					new Function<SnaxElement, SnaxAble>() {
+						@Override
+						public SnaxAble apply(SnaxElement input) {
+							return new ElementSnaxAble(input);
+						}
+					};
+			
 			final SnaxElement E;
-			ElementSnaxAble(SnaxElement e) {
+			public ElementSnaxAble(SnaxElement e) {
 				E = e;
 			}
 			
@@ -87,6 +97,27 @@ public interface SnaxAble {
 						kid.toSnax(sch);
 				sch.endElement(E.name());
 			}
+		}
+	}
+	
+	class SnaxText implements SnaxAble {
+		final Object DELEGATE;
+		/**
+		 * @param delegate the object whose #toString will be these text contents.
+		 *  never null, and #toString mustn't return null either (but may return empty-string).
+		 * @throws IllegalArgumentException if {@code delegate} is {@code null}
+		 */
+		public SnaxText(Object delegate) {
+			DELEGATE = delegate;
+			Preconditions.checkArgument(null != DELEGATE,
+					"delegate mustn't be null");
+		}
+		@Override
+		public void toSnax(SimpleContentHandler sch) throws SAXException {
+			String s = DELEGATE.toString();
+			Preconditions.checkArgument(null != s,
+					"delegate toString mustn't return null");
+			sch.characters(toString());
 		}
 	}
 }
