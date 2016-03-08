@@ -101,6 +101,14 @@ public interface SnaxAble {
 	}
 	
 	class SnaxText implements SnaxAble {
+		public static final Function<Object, SnaxAble> SNAX_TEXT =
+				new Function<Object, SnaxAble>() {
+					@Override
+					public SnaxAble apply(Object input) {
+						return new SnaxText(input);
+					}
+				};
+		
 		final Object DELEGATE;
 		/**
 		 * @param delegate the object whose #toString will be these text contents.
