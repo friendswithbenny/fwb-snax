@@ -48,14 +48,16 @@ public interface SnaxAble {
 	interface SnaxElement {
 		String name();
 		Map<String, String> atts();
-		Iterable<? extends SnaxAble> kids();
+		// TODO consider whether this should be Iterable<? extends SnaxAble>
+		// i think actually not, likewise obviously not <T extends SnaxAble>
+		Iterable<SnaxAble> kids();
 		
 		/** immutable data implementation */
 		class SnaxElementImpl implements SnaxElement {
 			final String NAME;
 			final Map<String, String> ATTS;
-			final Iterable<? extends SnaxAble> KIDS;
-			public SnaxElementImpl(String name, Map<String, String> atts, Iterable<? extends SnaxAble> kids) {
+			final Iterable<SnaxAble> KIDS;
+			public SnaxElementImpl(String name, Map<String, String> atts, Iterable<SnaxAble> kids) {
 				NAME = name;
 				ATTS = atts;
 				KIDS = kids; // TODO ImmutableList.copyOf?
@@ -70,7 +72,7 @@ public interface SnaxAble {
 				return ATTS;
 			}
 			@Override
-			public Iterable<? extends SnaxAble> kids() {
+			public Iterable<SnaxAble> kids() {
 				return KIDS;
 			}
 		}
