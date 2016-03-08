@@ -31,10 +31,10 @@ public interface SnaxAble {
 	void toSnax(SimpleContentHandler sch) throws SAXException;
 	
 	class SnaxSource extends SAXSource {
-		SnaxSource(SnaxAble x) {
+		public SnaxSource(SnaxAble x) {
 			super(new SnaxReader(), new SnaxInput(x));
 		}
-		SnaxSource(SnaxAble x, XMLReader r) {
+		public SnaxSource(SnaxAble x, XMLReader r) {
 			super(new SnaxReader(r), new SnaxInput(x));
 		}
 	}
