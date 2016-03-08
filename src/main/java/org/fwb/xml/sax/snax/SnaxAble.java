@@ -117,7 +117,7 @@ public interface SnaxAble {
 			String s = DELEGATE.toString();
 			Preconditions.checkArgument(null != s,
 					"delegate toString mustn't return null");
-			sch.characters(toString());
+			sch.characters(s);
 		}
 	}
 }
