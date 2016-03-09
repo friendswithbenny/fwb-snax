@@ -9,6 +9,7 @@ import java.net.URL;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXTransformerFactory;
@@ -79,6 +80,10 @@ public class SaxUtil {
 	}
 	
 	static final SAXTransformerFactory STF = TraxUtil.newSaxTransformerFactory();
+	/** @see #createContentHandler(Result, boolean) */
+	public static ContentHandler createContentHandler(Result r) {
+		return createContentHandler(r, false);
+	}
 	/**
 	 * creates a ContentHandler whose events are sent to the given Result.
 	 * 
@@ -87,10 +92,12 @@ public class SaxUtil {
 	 * @param r the Result to which to send all events on the returned ContentHandler
 	 * @return an instance of TransformerHandler (i.e. NOT SimpleContentHandler)
 	 */
-	public static ContentHandler createContentHandler(Result r) {
+	public static ContentHandler createContentHandler(Result r, boolean indent) {
 		TransformerHandler retVal;
 		try {
 			retVal = STF.newTransformerHandler();
+			if (indent)
+				retVal.getTransformer().setOutputProperty(OutputKeys.INDENT, "yes");
 		} catch (TransformerConfigurationException e) {
 			// identity transformer should never fail
 			throw new Error("never happens", e);
