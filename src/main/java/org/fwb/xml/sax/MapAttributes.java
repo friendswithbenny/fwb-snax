@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.xml.XMLConstants;
 
-import org.fwb.collection.ListIndex.IndexedList;
+import org.fwb.alj.col.ListIndex.IndexedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
  * exposes a collections {@link Map} as sax {@link Attributes} of datatype 'CDATA'.
  * TODO a version with Object values which infers a more precise datatype?
  * 
- * @deprecated see {@link ListAttributes#asMap}
+ * @deprecated see {@link ListAttributes#forMap}
  */
 class MapAttributes implements Attributes {
 	static final Logger LOG = LoggerFactory.getLogger(MapAttributes.class);

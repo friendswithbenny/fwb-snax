@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.xml.XMLConstants;
 
-import org.fwb.collection.ListIndex.IndexedList;
+import org.fwb.alj.col.ListIndex.IndexedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
