@@ -6,19 +6,42 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * utility methods for java's Transformation API for XML.
  */
 public class TraxUtil {
+	static final Logger LOG = LoggerFactory.getLogger(TraxUtil.class);
+	
 	/** @deprecated static utilities only */
 	@Deprecated
 	private TraxUtil() { }
 	
+	static final SAXTransformerFactory STF = newSaxTransformerFactory();
+	
+	/** @deprecated TODO test */
+	static final Templates XSL_CHILDELEMENT_SUBSEQUENCE = newTemplatesUnchecked(
+			new StreamSource(TraxUtil.class.getResource("childelement-subsequence.xsl").toExternalForm()));
+	
 	public static final SAXTransformerFactory newSaxTransformerFactory() {
 		return (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+	}
+	
+	static final Templates newTemplatesUnchecked(Source s) {
+		try {
+			return STF.newTemplates(s);
+		} catch (TransformerConfigurationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static StreamResult result(File f) {
