@@ -36,7 +36,17 @@ public class TraxUtil {
 		return (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 	}
 	
-	static final Templates newTemplatesUnchecked(Source s) {
+	/**
+	 * @param cls class which shares a path with the XSL resource
+	 * @param xsl XSL resource filename
+	 */
+	public static Templates newTemplates(Class<?> cls, String xsl) {
+		return newTemplatesUnchecked(
+				new StreamSource(
+						cls.getResource(xsl).toExternalForm()));
+	}
+	
+	static Templates newTemplatesUnchecked(Source s) {
 		try {
 			return STF.newTemplates(s);
 		} catch (TransformerConfigurationException e) {
