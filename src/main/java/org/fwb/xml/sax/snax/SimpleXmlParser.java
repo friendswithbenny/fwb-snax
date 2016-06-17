@@ -1,4 +1,4 @@
-package org.fwb.xml.sax;
+package org.fwb.xml.sax.snax;
 
 import java.io.Closeable;
 import java.io.IOException;
