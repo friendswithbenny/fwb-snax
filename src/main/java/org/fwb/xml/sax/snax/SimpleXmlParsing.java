@@ -152,14 +152,14 @@ public class SimpleXmlParsing {
 		}
 	}
 	
-	public static class SimpleXmlReader implements XMLReader {
+	public static class SimpleXMLReader implements XMLReader {
 		final ParseManager SXP;
 		final SimpleXmlParser<?> SXR;
 		/** @see ParseManager#INSTANCE */
-		public SimpleXmlReader(SimpleXmlParser<?> sxr) {
+		public SimpleXMLReader(SimpleXmlParser<?> sxr) {
 			this(ParseManager.INSTANCE, sxr);
 		}
-		public SimpleXmlReader(ParseManager sxp, SimpleXmlParser<?> sxr) {
+		public SimpleXMLReader(ParseManager sxp, SimpleXmlParser<?> sxr) {
 			SXP = sxp;
 			SXR = sxr;
 		}
