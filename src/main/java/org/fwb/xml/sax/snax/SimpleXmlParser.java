@@ -10,9 +10,17 @@ import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -43,35 +51,39 @@ public class SimpleXmlParser {
 		 * this method should expect to be called within a managed context,
 		 * and need NOT close the given Reader when finished nor in the event of an error.
 		 * 
+		 * @param sch not null; do not call {@link ContentHandler#startDocument()} nor {@link ContentHandler#endDocument()}
 		 * @param r not null; do not close
 		 * @param systemId possibly null
 		 * @return a value of the implementor's choice
 		 */
-		T parse(Reader r, String systemId) throws IOException, SAXException;
+		T parse(SimpleContentHandler sch, Reader r, String systemId) throws IOException, SAXException;
 	}
 	
-	final Charset CHARSET;
-	public SimpleXmlParser() {
-		this(Charset.defaultCharset());
-	}
-	public SimpleXmlParser(Charset charset) {
-		CHARSET = Preconditions.checkNotNull(charset, "charset mustn't be null");
-	}
+	public static final SimpleXmlParser INSTANCE = new SimpleXmlParser();
+	/**
+	 * accessible to sub-classes only, for over-ride.
+	 * @see #INSTANCE
+	 */
+	protected SimpleXmlParser() {}
 	
 	/**
 	 * calls the {@link SimpleXmlReader#parse(Reader, String)} method,
 	 * if necessary obtaining a character stream (via {@link #openStream(String)}) and closing it.
 	 * 
-	 * this method is stateless and multithread-safe.
+	 * this method is state-less and thread-safe
+	 * 
+	 * @param input not null
+	 * @param sch not null
 	 */
-	public <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException, SAXException {
-		Preconditions.checkNotNull(rp, "ReaderParser mustn't be null");
+	public <T> T parseManaged(SimpleXmlReader<T> sxr, SimpleContentHandler sch, InputSource input) throws IOException, SAXException {
 		Preconditions.checkNotNull(input, "InputSource mustn't be null");
+		Preconditions.checkNotNull(sch, "SimpleContentHandler mustn't be null");
 		
 		boolean newStream = false;
 		
 		Reader r = input.getCharacterStream();
 		String url = input.getSystemId();
+		String encoding = input.getEncoding();
 		if (null == r) {
 			InputStream is = input.getByteStream();
 			if (null == is) {
@@ -83,7 +95,8 @@ public class SimpleXmlParser {
 			}
 			
 			try {
-				r = new InputStreamReader(is, CHARSET);
+				r = getReaderFromStream(is,
+						null == encoding ? null : Charset.forName(encoding));
 			} finally {
 				if (null == r && newStream) // exception was thrown, so silence #close
 					closeQuietly(is,
@@ -93,7 +106,10 @@ public class SimpleXmlParser {
 		}
 		
 		try {
-			T retVal = rp.parse(r, input.getSystemId());
+			sch.startDocument();
+			T retVal = sxr.parse(sch, r, input.getSystemId());
+			sch.endDocument();
+			
 			if (newStream) {
 				newStream = false;
 				r.close(); // IOE
@@ -109,9 +125,101 @@ public class SimpleXmlParser {
 	
 	/**
 	 * may be over-ridden by sub-classes to specify URLConnection details
+	 * @param systemId not null
 	 */
 	protected InputStream openStream(String systemId) throws IOException {
+		Preconditions.checkNotNull(systemId, "systemId mustn't be null");
+		
 		return new URL(systemId).openStream();
+	}
+	/**
+	 * may be over-ridden by sub-classes to specify e.g. a specific charset
+	 * 
+	 * @param is not null
+	 * @param charset may be null
+	 * 
+	 * TODO this method should be updated to implement "guessing" rather than use system default charset
+	 * @see https://www.w3.org/TR/REC-xml/#sec-guessing
+	 */
+	protected Reader getReaderFromStream(InputStream is, Charset charset) {
+		Preconditions.checkNotNull(is, "inputstream mustn't be null");
+		
+		return new InputStreamReader(is, MoreObjects.firstNonNull(
+				charset,
+				Charset.defaultCharset()));
+	}
+	
+	public static class SimpleXmlParserXMLReader implements XMLReader {
+		final SimpleXmlParser SXP;
+		final SimpleXmlReader<?> SXR;
+		public SimpleXmlParserXMLReader(SimpleXmlReader<?> sxr) {
+			this(INSTANCE, sxr);
+		}
+		public SimpleXmlParserXMLReader(SimpleXmlParser sxp, SimpleXmlReader<?> sxr) {
+			SXP = sxp;
+			SXR = sxr;
+		}
+		
+		@Override
+		public void parse(InputSource input) throws IOException, SAXException {
+			SXP.parseManaged(SXR, getContentHandler(), input);
+		}
+		@Override
+		public void parse(String systemId) throws IOException, SAXException {
+			parse(new InputSource(systemId));
+		}
+		
+		private SimpleContentHandler sch;
+		@Override
+		public void setContentHandler(ContentHandler handler) {
+			sch = SimpleContentHandler.of(handler);
+		}
+		@Override
+		public SimpleContentHandler getContentHandler() {
+			return sch;
+		}
+		
+		/* * TODO * */
+		@Override
+		public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public Object getProperty(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public void setEntityResolver(EntityResolver resolver) {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public EntityResolver getEntityResolver() {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public void setDTDHandler(DTDHandler handler) {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public DTDHandler getDTDHandler() {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public void setErrorHandler(ErrorHandler handler) {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
+		@Override
+		public ErrorHandler getErrorHandler() {
+			throw new UnsupportedOperationException("TODO"); // TODO
+		}
 	}
 	
 	/**
