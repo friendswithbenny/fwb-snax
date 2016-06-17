@@ -71,7 +71,8 @@ public class SimpleXmlParser {
 			InputStream is = input.getByteStream();
 			if (null == is) {
 				Preconditions.checkNotNull(url,
-						"Reader, InputStream, and SystemID mustn't ALL be null");
+						"Reader, InputStream, and SystemID mustn't ALL be null: %s",
+						input);
 				is = openStream(url);
 				newStream = true;
 			}
