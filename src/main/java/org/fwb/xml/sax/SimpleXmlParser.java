@@ -30,6 +30,10 @@ import com.google.common.base.Preconditions;
 public class SimpleXmlParser {
 	static final Logger LOG = LoggerFactory.getLogger(SimpleXmlParser.class);
 	
+	/** @deprecated static utilities only */
+	@Deprecated
+	private SimpleXmlParser() {}
+	
 	/**
 	 * a simple expression of character-stream parsing logic
 	 * @param <T> a return value of the implementor's choice
