@@ -25,7 +25,9 @@ import com.google.common.base.Preconditions;
  * rather than perform these duties with a surprising amount of boilerplate,
  * implementors of {@link XMLReader#parse} may instead:
  * 1. implement the more consistent contract of {@link SimpleXmlReader#parse(Reader, String)}
- * 2. delegate to {@link #parse(SimpleXmlReader, InputSource)} to provide stream management.-
+ * 2. delegate to {@link #parse(SimpleXmlReader, InputSource)} to provide stream management.
+ * 
+ * TODO tests!
  */
 public class SimpleXmlParser {
 	static final Logger LOG = LoggerFactory.getLogger(SimpleXmlParser.class);
@@ -58,6 +60,8 @@ public class SimpleXmlParser {
 	/**
 	 * calls the {@link SimpleXmlReader#parse(Reader, String)} method,
 	 * if necessary obtaining a character stream (via {@link #openStream(String)}) and closing it.
+	 * 
+	 * this method is stateless and multithread-safe.
 	 */
 	public <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException {
 		Preconditions.checkNotNull(rp, "ReaderParser mustn't be null");
