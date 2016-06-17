@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Preconditions;
 
@@ -46,7 +47,7 @@ public class SimpleXmlParser {
 		 * @param systemId possibly null
 		 * @return a value of the implementor's choice
 		 */
-		T parse(Reader r, String systemId);
+		T parse(Reader r, String systemId) throws IOException, SAXException;
 	}
 	
 	final Charset CHARSET;
@@ -63,7 +64,7 @@ public class SimpleXmlParser {
 	 * 
 	 * this method is stateless and multithread-safe.
 	 */
-	public <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException {
+	public <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException, SAXException {
 		Preconditions.checkNotNull(rp, "ReaderParser mustn't be null");
 		Preconditions.checkNotNull(input, "InputSource mustn't be null");
 		
