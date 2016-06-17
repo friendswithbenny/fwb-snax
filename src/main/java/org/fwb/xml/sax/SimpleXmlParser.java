@@ -15,8 +15,8 @@ import org.xml.sax.InputSource;
 import com.google.common.base.Preconditions;
 
 /**
- * this utility simplifies the {@link XMLReader} interface for
- * (a vast majority of) cases where a character stream is required.
+ * this utility simplifies (implementation of) the {@link XMLReader} interface
+ * for (a vast majority of) cases where a character stream is required.
  * 
  * it is typically the parser's responsibility to:
  * 1. obtain the stream if it is not included in the {@link InputSource}
@@ -24,13 +24,17 @@ import com.google.common.base.Preconditions;
  * 
  * rather than perform these duties with a surprising amount of boilerplate,
  * implementors of {@link XMLReader#parse} may instead:
- * 1. implement the more consistent contract of {@link ReaderParser#parse(Reader, String)}
- * 2. delegate to {@link #parse(ReaderParser, InputSource)} to provide stream management.-
+ * 1. implement the more consistent contract of {@link SimpleXmlReader#parse(Reader, String)}
+ * 2. delegate to {@link #parse(SimpleXmlReader, InputSource)} to provide stream management.-
  */
 public class SimpleXmlParser {
 	static final Logger LOG = LoggerFactory.getLogger(SimpleXmlParser.class);
 	
-	public interface ReaderParser {
+	/**
+	 * a simple expression of character-stream parsing logic
+	 * @param <T> a return value of the implementor's choice
+	 */
+	public interface SimpleXmlReader<T> {
 		/**
 		 * a common basic signature for implementors of of character-stream parsing logic.
 		 * this method should expect to be called within a managed context,
@@ -38,15 +42,16 @@ public class SimpleXmlParser {
 		 * 
 		 * @param r not null; do not close
 		 * @param systemId possibly null
+		 * @return a value of the implementor's choice
 		 */
-		void parse(Reader r, String systemId);
+		T parse(Reader r, String systemId);
 	}
 	
 	/**
-	 * calls the {@link ReaderParser#parse(Reader, String)} method,
+	 * calls the {@link SimpleXmlReader#parse(Reader, String)} method,
 	 * obtaining a character stream, and closing it, if necessary.
 	 */
-	public static void parseManaged(ReaderParser rp, InputSource input) throws IOException {
+	public static <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException {
 		Preconditions.checkNotNull(rp, "ReaderParser mustn't be null");
 		Preconditions.checkNotNull(input, "InputSource mustn't be null");
 		
@@ -66,7 +71,7 @@ public class SimpleXmlParser {
 			try {
 				r = new InputStreamReader(is, Charset.defaultCharset());
 			} finally {
-				if (null == r && newStream) // exception was thrown, so silence.
+				if (null == r && newStream) // exception was thrown, so silence #close
 					closeQuietly(is, String.format(
 							"silenced close-error after failed to create InputStreamReader(InputSource(%s, %s))",
 							url, is));
@@ -74,13 +79,14 @@ public class SimpleXmlParser {
 		}
 		
 		try {
-			rp.parse(r, input.getSystemId());
+			T retVal = rp.parse(r, input.getSystemId());
 			if (newStream) {
 				newStream = false;
 				r.close(); // IOE
 			}
+			return retVal;
 		} finally {
-			if (newStream) // exception was thrown, so silence
+			if (newStream) // exception was thrown by #parse, so silence #close
 				closeQuietly(r, String.format(
 						"silenced close-error after failed to parse(InputSource(%s, %s))",
 						url, r));
@@ -101,7 +107,7 @@ public class SimpleXmlParser {
 		InputStream is = url.openStream(); try {
 			retVal = new InputStreamReader(is, Charset.defaultCharset());
 		} finally {
-			if (null == retVal) // exception was thrown, so silence.
+			if (null == retVal) // exception was thrown, so silence #close
 				closeQuietly(is, String.format(
 						"silenced close-error after failed to create InputStreamReader(%s)",
 						url));
