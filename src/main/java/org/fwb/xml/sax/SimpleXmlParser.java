@@ -15,39 +15,40 @@ import org.xml.sax.InputSource;
 import com.google.common.base.Preconditions;
 
 /**
- * TODO cleanup docs and un-deprecate
+ * this utility simplifies the {@link XMLReader} interface for
+ * (a vast majority of) cases where a character stream is required.
  * 
- * note as ugly as this class is, its large {@link #parse} method
- * is actually just a massive boilerplate extract,
- * which SHOULD be present in any XMLReader implementation.
- * so, worth it.
+ * it is typically the parser's responsibility to:
+ * 1. obtain the stream if it is not included in the {@link InputSource}
+ * 2. robustly release said resource, if obtained in #1.
  * 
- * this extension to the {@link XMLReader} interface defines
- * what I claim is the most logical method for any text-parser to implement.
- * 
- * in this API, the {@link Reader} is guaranteed to be resolved,
- * and it's intended to be invoked inside wrapper architecture/framework
- * which externally provides resource-management ({@link Closeable#close()}).
- * 
- * @deprecated TODO remove this, it's information-only,
- * a decent implementation of a bad-choice for the API.
- * I'll replace this with a simple wrapped parse(InputStream) method,
- * performing both these purposes (ensuring Reader, and managing resources accordingly)
+ * rather than perform these duties with a surprising amount of boilerplate,
+ * implementors of {@link XMLReader#parse} may instead:
+ * 1. implement the more consistent contract of {@link ReaderParser#parse(Reader, String)}
+ * 2. delegate to {@link #parse(ReaderParser, InputSource)} to provide stream management.-
  */
 public class SimpleXmlParser {
 	static final Logger LOG = LoggerFactory.getLogger(SimpleXmlParser.class);
 	
-	interface ReaderParser {
+	public interface ReaderParser {
 		/**
+		 * a common basic signature for implementors of of character-stream parsing logic.
+		 * this method should expect to be called within a managed context,
+		 * and need NOT close the given Reader when finished nor in the event of an error.
+		 * 
 		 * @param r not null; do not close
 		 * @param systemId possibly null
 		 */
 		void parse(Reader r, String systemId);
 	}
 	
-	static void parse(InputSource input, ReaderParser rp) throws IOException {
-		Preconditions.checkNotNull(input, "InputSource mustn't be null");
+	/**
+	 * calls the {@link ReaderParser#parse(Reader, String)} method,
+	 * obtaining a character stream, and closing it, if necessary.
+	 */
+	public static void parseManaged(ReaderParser rp, InputSource input) throws IOException {
 		Preconditions.checkNotNull(rp, "ReaderParser mustn't be null");
+		Preconditions.checkNotNull(input, "InputSource mustn't be null");
 		
 		boolean newStream = false;
 		
@@ -66,8 +67,9 @@ public class SimpleXmlParser {
 				r = new InputStreamReader(is, Charset.defaultCharset());
 			} finally {
 				if (null == r && newStream) // exception was thrown, so silence.
-					closeQuietly(is,
-							String.format("silenced close-error after failed to create InputStreamReader(InputSource(%s, %s))", url, is));
+					closeQuietly(is, String.format(
+							"silenced close-error after failed to create InputStreamReader(InputSource(%s, %s))",
+							url, is));
 			}
 		}
 		
@@ -79,32 +81,44 @@ public class SimpleXmlParser {
 			}
 		} finally {
 			if (newStream) // exception was thrown, so silence
-				closeQuietly(r,
-						String.format("silenced close-error after failed to parse(InputSource(%s, %s))", url, r));
+				closeQuietly(r, String.format(
+						"silenced close-error after failed to parse(InputSource(%s, %s))",
+						url, r));
 		}
 	}
 	
 	/**
 	 * opens a stream, then converts it to an InputStreamReader,
 	 * closing the former (quietly) if the latter fails.
+	 * 
+	 * @deprecated not used
+	 * TODO move this to fwb-ciao
 	 */
 	static Reader openReader(URL url) throws IOException {
+		Preconditions.checkNotNull(url, "url mustn't be null");
+		
 		Reader retVal = null;
 		InputStream is = url.openStream(); try {
 			retVal = new InputStreamReader(is, Charset.defaultCharset());
 		} finally {
 			if (null == retVal) // exception was thrown, so silence.
-				closeQuietly(is,
-						String.format("silenced close-error after failed to create InputStreamReader(%s)", url));
+				closeQuietly(is, String.format(
+						"silenced close-error after failed to create InputStreamReader(%s)",
+						url));
 		}
 		return retVal;
 	}
 	
-	static void closeQuietly(Closeable c, String errorMessage) {
+	/**
+	 * TODO move this to fwb-ciao
+	 * 
+	 * @param logError a message to log (error-level) if closing fails
+	 */
+	static void closeQuietly(Closeable c, String logError) {
 		try {
 			c.close();
 		} catch (Throwable t) {
-			LOG.error(errorMessage, t);
+			LOG.error(logError, t);
 		}
 	}
 }
