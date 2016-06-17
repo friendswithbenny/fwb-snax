@@ -47,6 +47,14 @@ public class SimpleXmlParser {
 		T parse(Reader r, String systemId);
 	}
 	
+	final Charset CHARSET;
+	public SimpleXmlParser() {
+		this(Charset.defaultCharset());
+	}
+	public SimpleXmlParser(Charset charset) {
+		CHARSET = Preconditions.checkNotNull(charset, "charset mustn't be null");
+	}
+	
 	/**
 	 * calls the {@link SimpleXmlReader#parse(Reader, String)} method,
 	 * if necessary obtaining a character stream (via {@link #openStream(String)}) and closing it.
@@ -69,7 +77,7 @@ public class SimpleXmlParser {
 			}
 			
 			try {
-				r = new InputStreamReader(is, Charset.defaultCharset());
+				r = new InputStreamReader(is, CHARSET);
 			} finally {
 				if (null == r && newStream) // exception was thrown, so silence #close
 					closeQuietly(is,
@@ -104,15 +112,19 @@ public class SimpleXmlParser {
 	 * opens a stream, then converts it to an InputStreamReader,
 	 * closing the former (quietly) if the latter fails.
 	 * 
+	 * @param charset null to use default charset
+	 * 
 	 * @deprecated not used
 	 * TODO move this to fwb-ciao
 	 */
-	static Reader openReader(URL url) throws IOException {
+	static Reader openReader(URL url, Charset charset) throws IOException {
 		Preconditions.checkNotNull(url, "url mustn't be null");
+		if (null == charset)
+			charset = Charset.defaultCharset();
 		
 		Reader retVal = null;
 		InputStream is = url.openStream(); try {
-			retVal = new InputStreamReader(is, Charset.defaultCharset());
+			retVal = new InputStreamReader(is, charset);
 		} finally {
 			if (null == retVal) // exception was thrown, so silence #close
 				closeQuietly(is,
