@@ -30,10 +30,6 @@ import com.google.common.base.Preconditions;
 public class SimpleXmlParser {
 	static final Logger LOG = LoggerFactory.getLogger(SimpleXmlParser.class);
 	
-	/** @deprecated static utilities only */
-	@Deprecated
-	private SimpleXmlParser() {}
-	
 	/**
 	 * a simple expression of character-stream parsing logic
 	 * @param <T> a return value of the implementor's choice
@@ -53,9 +49,9 @@ public class SimpleXmlParser {
 	
 	/**
 	 * calls the {@link SimpleXmlReader#parse(Reader, String)} method,
-	 * obtaining a character stream, and closing it, if necessary.
+	 * if necessary obtaining a character stream (via {@link #openStream(String)}) and closing it.
 	 */
-	public static <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException {
+	public <T> T parseManaged(SimpleXmlReader<T> rp, InputSource input) throws IOException {
 		Preconditions.checkNotNull(rp, "ReaderParser mustn't be null");
 		Preconditions.checkNotNull(input, "InputSource mustn't be null");
 		
@@ -68,7 +64,7 @@ public class SimpleXmlParser {
 			if (null == is) {
 				Preconditions.checkNotNull(url,
 						"Reader, InputStream, and SystemID mustn't ALL be null");
-				is = new URL(url).openStream(); // IOE
+				is = openStream(url);
 				newStream = true;
 			}
 			
@@ -76,9 +72,9 @@ public class SimpleXmlParser {
 				r = new InputStreamReader(is, Charset.defaultCharset());
 			} finally {
 				if (null == r && newStream) // exception was thrown, so silence #close
-					closeQuietly(is, String.format(
+					closeQuietly(is,
 							"silenced close-error after failed to create InputStreamReader(InputSource(%s, %s))",
-							url, is));
+							url, is);
 			}
 		}
 		
@@ -91,10 +87,17 @@ public class SimpleXmlParser {
 			return retVal;
 		} finally {
 			if (newStream) // exception was thrown by #parse, so silence #close
-				closeQuietly(r, String.format(
+				closeQuietly(r,
 						"silenced close-error after failed to parse(InputSource(%s, %s))",
-						url, r));
+						url, r);
 		}
+	}
+	
+	/**
+	 * may be over-ridden by sub-classes to specify URLConnection details
+	 */
+	protected InputStream openStream(String systemId) throws IOException {
+		return new URL(systemId).openStream();
 	}
 	
 	/**
@@ -112,23 +115,31 @@ public class SimpleXmlParser {
 			retVal = new InputStreamReader(is, Charset.defaultCharset());
 		} finally {
 			if (null == retVal) // exception was thrown, so silence #close
-				closeQuietly(is, String.format(
+				closeQuietly(is,
 						"silenced close-error after failed to create InputStreamReader(%s)",
-						url));
+						url);
 		}
 		return retVal;
 	}
 	
 	/**
 	 * TODO move this to fwb-ciao
+	 */
+	static void closeQuietly(Closeable c) {
+		closeQuietly(c, "silenced close-error");
+	}
+	/**
+	 * TODO move this to fwb-ciao
 	 * 
 	 * @param logError a message to log (error-level) if closing fails
 	 */
-	static void closeQuietly(Closeable c, String logError) {
+	static void closeQuietly(Closeable c, String logError, Object... logErrorArgs) {
 		try {
 			c.close();
 		} catch (Throwable t) {
-			LOG.error(logError, t);
+			LOG.error(
+					String.format(logError, logErrorArgs),
+					t);
 		}
 	}
 }
