@@ -1,9 +1,9 @@
 package org.fwb.xml.jaxp.xsd;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import javax.xml.validation.Schema;
@@ -16,33 +16,44 @@ import org.xml.sax.SAXException;
  * source: https://www.tutorialspoint.com/xsd/xsd_validation.htm
  */
 public class SchemaUtil {
-	public static void main(String[] args) {
+	/**
+	 * returns normally if validation succeeds
+	 * @throws SAXException if validation fails
+	 * @throws RuntimeException (wrapping) if other errors occur
+	 */
+	public static void main(String[] args) throws SAXException {
 		if (args.length != 2) {
 			System.out.println("Usage : XSDValidator <file-name.xsd> <file-name.xml>");
 		} else {
-			boolean isValid = validateXMLSchema(args[0], args[1]);
-
-			if (isValid) {
-				System.out.println(args[1] + " is valid against " + args[0]);
-			} else {
-				System.out.println(args[1] + " is not valid against " + args[0]);
-			}
+			validateXMLSchema(args[0], args[1]);
 		}
 	}
-
-	public static boolean validateXMLSchema(String xsdPath, String xmlPath) {
+	
+	/**
+	 * @throws RuntimeException wrapping IOException from {@link Validator#validate(Source)}
+	 * @throws SAXException from {@link Validator#validate(Source)}
+	 */
+	public static void validateXMLSchema(String xsdURI, String xmlURI) throws SAXException {
+		Schema schema = parseSchema(xsdURI);
+		Validator validator = schema.newValidator();
 		try {
-			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = factory.newSchema(new File(xsdPath));
-			Validator validator = schema.newValidator();
-			validator.validate(new StreamSource(new File(xmlPath)));
+			validator.validate(new StreamSource(xmlURI));
 		} catch (IOException e) {
-			System.out.println("Exception: " + e.getMessage());
-			return false;
-		} catch (SAXException e1) {
-			System.out.println("SAX Exception: " + e1.getMessage());
-			return false;
+			throw new RuntimeException(e);
 		}
-		return true;
 	}
+	
+	static SchemaFactory newFactory() {
+		return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	}
+	/** @throws RuntimeException wrapping SAXException from SchemaFactory#newSchema */
+	public static Schema parseSchema(String xsdURI) {
+		SchemaFactory factory = newFactory();
+		try {
+			return factory.newSchema(new StreamSource(xsdURI));
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	// XXX TODO consider the newSchema(Source[]) method as well?
 }
