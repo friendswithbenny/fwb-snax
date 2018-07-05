@@ -9,7 +9,13 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestJson2Xml {
+/**
+ * @deprecated
+ * unfortunately this class was using raw-string comparison to validate JSON processing results.
+ * the craptabulous JSON maps are un-ordered, so the craptabulous parser doesn't support stable ordering.
+ * (granted, there are ALSO some good reasons for this..)
+ */
+class TestJson2Xml {
 	static final Logger LOG = LoggerFactory.getLogger(TestJson2Xml.class);
 	
 	static final String
@@ -18,14 +24,14 @@ public class TestJson2Xml {
 		XML1 = "<bam><3>4</3><1>2</1></bam><foo>13</foo><bar>7</bar>",
 		XML2 = "<json>foo</json><json>13</json><json>bar</json><json>7</json><json>bam</json><json>1</json><json>2</json><json>3</json><json>4</json>";
 	
-	@Test
+//	@Test
 	public void testJson2Xml() {
 		assertEquals("<json>" + XML1 + "</json>", Json2Xml.json2xml(JSON1));
 		assertEquals(XML2, Json2Xml.json2xml(JSON2));
 		assertEquals(XML1, Json2Xml.json2xmlNoRoot(JSON1));
 	}
 	
-	@Test
+//	@Test
 	public void testSanityChecks() {
 		// XML.toString takes already-parsed json input
 		// ex. this is interpreted as a json-string input
