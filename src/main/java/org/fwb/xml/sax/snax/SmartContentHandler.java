@@ -37,9 +37,9 @@ import org.xml.sax.SAXException;
  * 
  * in all cases, a call to <code>flush()</code> will always force any pending events to be sent
  * 
- * @deprecated prefer {@link SimpleContentHandler} to this ultra-stateful sugar
+ * XXX prefer {@link SimpleContentHandler} to this ultra-stateful sugar
  */
-@Deprecated
+//@Deprecated
 public class SmartContentHandler extends SimpleContentHandler {
 	public static SmartContentHandler of(ContentHandler ch) {
 		return (ch instanceof SmartContentHandler) ? (SmartContentHandler) ch : new SmartContentHandler(ch);

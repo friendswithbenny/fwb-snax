@@ -12,7 +12,9 @@ public class TestSchema {
 		DEI_URI_RAW = "http://xbrl.sec.gov/dei/2014/dei-2014-01-31.xsd",
 		DEI_URI_HTTPS = "https://xbrl.sec.gov/dei/2014/dei-2014-01-31.xsd",
 		TEST_URI = TestSchema.class.getResource("xbrl-instance-test.xsd").toExternalForm(),
-		TEST_HACK = "file:///C:/Users/benni/git/flp-core/src/main/java/com/flp/core/src/sec/xsd/xbrl-instance-test.xsd";
+		TEST_HACK = "file:///C:/Users/benni/git/flp-core/src/main/java/com/flp/core/src/sec/xsd/xbrl-instance-test.xsd",
+		TEST_TEST = "file:///C:/Users/benni/git/flp-core/src/main/java/com/flp/core/src/sec/test2.xsd",
+		TEST_FINAL = "file:///C:/Users/benni/git/flp-core/src/main/java/com/flp/core/src/sec/xsd/xbrl-instance-test-finalhack.xsd";
 	
 	
 	public static void main(String[] args) throws Exception {
