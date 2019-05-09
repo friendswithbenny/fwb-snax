@@ -83,8 +83,8 @@ public class TestSnaxAble {
 	);
 	
 	static final String EXPECTED = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><theElementName firstAtt=\"thirteen\" secondAttribution=\"some value\">"
-			+ System.lineSeparator() + "<firstborn nationality=\"egyptian\" gender=\"masculine\"/>"
-			+ System.lineSeparator() + "<theSecondChild hair=\"blonde\" type=\"snazzy snax able\">some char broil too</theSecondChild>"
+			+ System.lineSeparator() + "    <firstborn nationality=\"egyptian\" gender=\"masculine\"/>"
+			+ System.lineSeparator() + "    <theSecondChild hair=\"blonde\" type=\"snazzy snax able\">some char broil too</theSecondChild>"
 			+ System.lineSeparator() + "</theElementName>"
 			+ System.lineSeparator();
 	
@@ -113,6 +113,7 @@ public class TestSnaxAble {
 	static final JAXBContext JC;
 	static {
 		try {
+//			JC = JAXBContext.newInstance();
 			JC = JAXBContext.newInstance(JaxbThing.class);
 		} catch (JAXBException e) {
 			throw new Error("never happens", e);
