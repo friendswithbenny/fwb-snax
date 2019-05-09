@@ -28,7 +28,7 @@
 		<fwb.alj.version>1.2-SNAPSHOT</fwb.alj.version>
 		
 		<slf4j.version>1.7.13</slf4j.version>
-		<guava.version>19.0</guava.version>
+		<guava.version>20.0</guava.version>
 		<json.version>20160212</json.version>
 		
 		<!-- test -->
