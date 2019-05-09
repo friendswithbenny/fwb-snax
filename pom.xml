@@ -77,5 +77,13 @@
 			<version>${xmlunit.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.2.11</version>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 </project>

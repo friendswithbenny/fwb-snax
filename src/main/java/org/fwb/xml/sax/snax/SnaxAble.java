@@ -14,7 +14,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
-import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+//import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -189,9 +193,21 @@ class SnaxInput extends InputSource {
 class SnaxReader extends XMLFilterImpl {
 	static final Logger LOG = LoggerFactory.getLogger(SnaxReader.class);
 	
+	static final SAXParserFactory PF = SAXParserFactory.newInstance();
+	
 	static XMLReader createXMLReader() {
+		
+		SAXParser parser;
 		try {
-			return XMLReaderFactory.createXMLReader();
+			parser = PF.newSAXParser();
+		} catch (ParserConfigurationException e) {
+			throw new Error(e);
+		} catch (SAXException e) {
+			throw new Error(e);
+		}
+		try {
+			return parser.getXMLReader();
+//			return XMLReaderFactory.createXMLReader();
 		} catch (SAXException e) {
 			throw new Error(e);
 		}
