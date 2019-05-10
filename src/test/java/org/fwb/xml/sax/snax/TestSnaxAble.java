@@ -83,8 +83,13 @@ public class TestSnaxAble {
 	);
 	
 	static final String EXPECTED = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><theElementName firstAtt=\"thirteen\" secondAttribution=\"some value\">"
-			+ System.lineSeparator() + "    <firstborn nationality=\"egyptian\" gender=\"masculine\"/>"
-			+ System.lineSeparator() + "    <theSecondChild hair=\"blonde\" type=\"snazzy snax able\">some char broil too</theSecondChild>"
+			// for openjdk12, the result is 4-space indented.
+//			+ System.lineSeparator() + "    <firstborn nationality=\"egyptian\" gender=\"masculine\"/>"
+//			+ System.lineSeparator() + "    <theSecondChild hair=\"blonde\" type=\"snazzy snax able\">some char broil too</theSecondChild>"
+			// for java8, the result is not indented
+			+ System.lineSeparator() + "<firstborn nationality=\"egyptian\" gender=\"masculine\"/>"
+			+ System.lineSeparator() + "<theSecondChild hair=\"blonde\" type=\"snazzy snax able\">some char broil too</theSecondChild>"
+			
 			+ System.lineSeparator() + "</theElementName>"
 			+ System.lineSeparator();
 	
